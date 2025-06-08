@@ -9,7 +9,7 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>ru.bolnik.dispatcher</groupId>
-    <artifactId>dispatcher</artifactId>
+    <artifactId>Dispatcher</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>dispatcher</name>
     <description>dispatcher</description>
