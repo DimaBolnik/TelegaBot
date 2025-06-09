@@ -3,7 +3,7 @@ package ru.bolnik.dispatcher.service.data;
 import java.util.HashMap;
 import java.util.Map;
 
-// хранение состояний пользователей по chatId из телегиСоздание
+// хранение состояний пользователей по chatId из телеги
 public class DialogState {
 
     private static final Map<Long, DialogStateEnum> states = new HashMap<>();
