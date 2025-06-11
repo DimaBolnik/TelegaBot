@@ -76,7 +76,7 @@ public class UserDialogService {
             int length = Integer.parseInt(lengthStr);
             DialogState.setState(chatId, DialogStateEnum.WAIT_BOLT_WEIGHT);
             BoltDataStore.setTempLength(chatId, length);
-            sendMessage(chatId, "Введите вес одного болта (грамм):");
+            sendMessage(chatId, "Введите вес изделий (грамм):");
         } catch (NumberFormatException e) {
             sendMessage(chatId, "Длина должна быть числом. Попробуйте снова.");
         }

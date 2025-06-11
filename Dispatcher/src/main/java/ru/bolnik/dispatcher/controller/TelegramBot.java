@@ -6,9 +6,7 @@ import org.springframework.stereotype.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
-import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 @Component
 public class TelegramBot extends TelegramLongPollingBot {
@@ -35,14 +33,6 @@ public class TelegramBot extends TelegramLongPollingBot {
         telegramMessageDispatcher.processUpdate(update);
     }
 
-    public void sendResponse(SendMessage sendMessage) {
-
-        try {
-            execute(sendMessage);
-        } catch (TelegramApiException e) {
-            logger.error("Ошибка при отправке сообщения: ", e);
-        }
-    }
 
     @Override
     public String getBotUsername() {
