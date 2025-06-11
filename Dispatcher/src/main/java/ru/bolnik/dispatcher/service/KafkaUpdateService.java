@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import ru.bolnik.dispatcher.model.Bolt;
 
 @Service
 public class KafkaUpdateService {
@@ -24,15 +25,19 @@ public class KafkaUpdateService {
     /**
      * Метод отправляет update в Kafka
      */
-    public void sendUpdateToKafka(Update update) {
-        if (update.hasMessage() && update.getMessage().hasText()) {
-            String messageText = update.getMessage().getText();
-            Long chatId = update.getMessage().getChatId();
+    public void sendUpdateToKafka(Bolt bolt, Long chatId) {
+        String json = String.format(
+                "{\"type\": \"Bolt\", \"chatId\": %d, \"gost\": \"%s\", \"size\": \"%s\", \"length\": %d, \"weight\": %.2f}",
+                chatId,
+                bolt.getGost(),
+                bolt.getSize(),
+                bolt.getLength(),
+                bolt.getWeight()
+        );
 
-            String jsonUpdate = String.format("{\"chatId\": \"%d\", \"text\": \"%s\"}", chatId, messageText);
+        kafkaTemplate.send(telegramUpdatesTopic, json);
 
-            kafkaTemplate.send(telegramUpdatesTopic, jsonUpdate);
-            logger.info("Отправлено в Kafka topic '{}': {}", telegramUpdatesTopic, jsonUpdate);
-        }
+            logger.info("Отправлено в Kafka topic '{}': {}", telegramUpdatesTopic, json);
+
     }
 }
