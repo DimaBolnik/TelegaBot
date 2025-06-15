@@ -27,7 +27,7 @@ public class KafkaUpdateService {
     }
 
     // отправка в топик kafka
-    public void sendUpdateToKafka(Product product, Long chatId) {
+    public void sendProductToKafka(Product product, Long chatId) {
         ProductDto dto = new ProductDto(
                 chatId,
                 product.getClass().getSimpleName(),
