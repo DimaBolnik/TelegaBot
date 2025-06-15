@@ -6,7 +6,9 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import ru.bolnik.dispatcher.controller.TelegramBot;
 import ru.bolnik.dispatcher.model.Bolt;
+import ru.bolnik.dispatcher.model.Nut;
 import ru.bolnik.dispatcher.model.tempState.BoltDataStore;
+import ru.bolnik.dispatcher.model.tempState.NutDataStore;
 import ru.bolnik.dispatcher.service.data.DialogState;
 import ru.bolnik.dispatcher.service.data.DialogStateEnum;
 import ru.bolnik.dispatcher.service.data.ProductTypeEnum;
@@ -36,6 +38,9 @@ public class UserDialogService {
             case WAIT_BOLT_SIZE -> waitForBoltSize(chatId, messageText);
             case WAIT_BOLT_LENGTH -> waitForBoltLength(chatId, messageText);
             case WAIT_BOLT_WEIGHT -> waitForBoltWeight(chatId, messageText);
+            case WAIT_NUT_GOST -> waitForNutGost(chatId, messageText);
+            case WAIT_NUT_SIZE -> waitForNutSize(chatId, messageText);
+            case WAIT_NUT_WEIGHT -> waitForNutWeight(chatId, messageText);
         }
     }
 
@@ -52,12 +57,15 @@ public class UserDialogService {
             return;
         }
 
-        if (productType == ProductTypeEnum.BOLT) {
-            DialogState.setState(chatId, DialogStateEnum.WAIT_BOLT_GOST);
-            sendMessage(chatId, "Введите ГОСТ для болта:");
-        } else {
-            DialogState.setState(chatId, DialogStateEnum.WAIT_BOLT_GOST); // пока просто заглушка
-            sendMessage(chatId, "Выбрана гайка. Введите ГОСТ:");
+        switch (productType) {
+            case BOLT -> {
+                DialogState.setState(chatId, DialogStateEnum.WAIT_BOLT_GOST);
+                sendMessage(chatId, "Выбран болт. Введите ГОСТ:");
+            }
+            case NUT -> {
+                DialogState.setState(chatId, DialogStateEnum.WAIT_NUT_GOST);
+                sendMessage(chatId, "Выбрана гайка. Введите ГОСТ:");
+            }
         }
     }
 
@@ -97,11 +105,45 @@ public class UserDialogService {
             Bolt bolt = new Bolt(gost, size, length, weight);
 
             // Отправляем объект в Kafka
-            kafkaUpdateService.sendUpdateToKafka(bolt, chatId);
+            kafkaUpdateService.sendProductToKafka(bolt, chatId);
 
             DialogState.clearState(chatId);
             BoltDataStore.clear(chatId);
             sendMessage(chatId, "Болт успешно создан и отправлен в систему!");
+        } catch (NumberFormatException e) {
+            sendMessage(chatId, "Вес должен быть числом. Попробуйте снова.");
+        }
+    }
+
+    private void waitForNutGost(Long chatId, String gost) {
+        NutDataStore.setTempGost(chatId, gost);
+        DialogState.setState(chatId, DialogStateEnum.WAIT_NUT_SIZE);
+        sendMessage(chatId, "Введите размер гайки (например, M10):");
+    }
+
+    private void waitForNutSize(Long chatId, String size) {
+        NutDataStore.setTempSize(chatId, size);
+        DialogState.setState(chatId, DialogStateEnum.WAIT_NUT_WEIGHT);
+        sendMessage(chatId, "Введите вес одной гайки (грамм):");
+    }
+
+    private void waitForNutWeight(Long chatId, String weightStr) {
+        try {
+            double weight = Double.parseDouble(weightStr);
+            if (weight <= 0) {
+                sendMessage(chatId, "Вес должен быть положительным числом.");
+                return;
+            }
+
+            String gost = NutDataStore.getTempGost(chatId);
+            String size = NutDataStore.getTempSize(chatId);
+
+            Nut nut = new Nut(gost, size, weight);
+            kafkaUpdateService.sendProductToKafka(nut, chatId);
+
+            NutDataStore.clear(chatId);
+            DialogState.clearState(chatId);
+            sendMessage(chatId, "Гайка успешно создана и отправлена в систему!");
         } catch (NumberFormatException e) {
             sendMessage(chatId, "Вес должен быть числом. Попробуйте снова.");
         }
