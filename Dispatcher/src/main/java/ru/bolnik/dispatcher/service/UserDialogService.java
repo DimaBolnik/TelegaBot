@@ -70,11 +70,13 @@ public class UserDialogService {
     }
 
     private void waitForBoltGost(Long chatId, String gost) {
+        BoltDataStore.setTempGost(chatId, gost);
         DialogState.setState(chatId, DialogStateEnum.WAIT_BOLT_SIZE);
         sendMessage(chatId, "Введите размер болта (например, M10):");
     }
 
     private void waitForBoltSize(Long chatId, String size) {
+        BoltDataStore.setTempSize(chatId, size);
         DialogState.setState(chatId, DialogStateEnum.WAIT_BOLT_LENGTH);
         sendMessage(chatId, "Введите длину болта (мм):");
     }
