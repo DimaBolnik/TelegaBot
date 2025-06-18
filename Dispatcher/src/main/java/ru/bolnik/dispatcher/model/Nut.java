@@ -10,6 +10,7 @@ import lombok.ToString;
 @ToString
 @AllArgsConstructor
 public class Nut implements Product {
+
     private final String gost;
     private final String size;
     // вес всего колличества гаек
