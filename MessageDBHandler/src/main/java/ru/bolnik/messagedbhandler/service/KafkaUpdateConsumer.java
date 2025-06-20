@@ -13,7 +13,6 @@ import ru.bolnik.messagedbhandler.repository.BoltRepository;
 import ru.bolnik.messagedbhandler.repository.NutRepository;
 
 @Service
-@RequiredArgsConstructor
 public class KafkaUpdateConsumer {
 
     private static final Logger logger = LoggerFactory.getLogger(KafkaUpdateConsumer.class);
@@ -22,8 +21,11 @@ public class KafkaUpdateConsumer {
     private final BoltRepository boltRepository;
     private final NutRepository nutRepository;
 
-    @Value("${kafka.topic.telegram-updates}")
-    private String telegramUpdatesTopic;
+    public KafkaUpdateConsumer(ObjectMapper objectMapper, BoltRepository boltRepository, NutRepository nutRepository) {
+        this.objectMapper = objectMapper;
+        this.boltRepository = boltRepository;
+        this.nutRepository = nutRepository;
+    }
 
     // Подписываемся на топик из application.properties
     @KafkaListener(topics = "${kafka.topic.telegram-updates}", groupId = "console-group")
@@ -32,7 +34,7 @@ public class KafkaUpdateConsumer {
             ProductDto dto = objectMapper.readValue(message, ProductDto.class);
             logger.info("Получено сообщение из Kafka: {}", message);
 
-            System.out.println(dto);
+            System.out.println(dto.toString());
 
         } catch (JsonProcessingException e) {
             logger.error("Ошибка десериализации JSON", e);
