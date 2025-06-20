@@ -11,8 +11,9 @@ import lombok.ToString;
 @AllArgsConstructor
 public class ProductDto {
     private final Long chatId;
-    private final String type;
+    private final String type; // "Bolt" или "Nut"
     private final String gost;
     private final String size;
+    private final Integer length; // Добавил для Bolt
     private final Double weight;
 }
