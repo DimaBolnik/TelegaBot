@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import ru.bolnik.dispatcher.dto.ProductDto;
+import ru.bolnik.dispatcher.model.Bolt;
 import ru.bolnik.dispatcher.model.Product;
 
 @Service
@@ -28,15 +29,22 @@ public class KafkaUpdateService {
 
     // отправка в топик kafka
     public void sendProductToKafka(Product product, Long chatId) {
+        Integer length = null;
+
+        if (product instanceof Bolt) {
+            length = ((Bolt) product).getLength();
+        }
+
         ProductDto dto = new ProductDto(
                 chatId,
                 product.getClass().getSimpleName(),
                 product.getGost(),
                 product.getSize(),
+                length,
                 product.getWeight()
         );
 
-        String json = null;
+        String json;
         try {
             json = objectMapper.writeValueAsString(dto);
             kafkaTemplate.send(telegramUpdatesTopic, json);
