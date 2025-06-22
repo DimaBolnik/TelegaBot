@@ -1,14 +1,29 @@
 package ru.bolnik.messagedbhandler.service;
 
 import org.springframework.stereotype.Service;
+import ru.bolnik.messagedbhandler.entity.Nut;
 import ru.bolnik.messagedbhandler.repository.NutRepository;
+
+import java.util.Optional;
 
 @Service
 public class NutService {
 
-    private final NutRepository NutRepository;
+    private final NutRepository nutRepository;
 
     public NutService(ru.bolnik.messagedbhandler.repository.NutRepository nutRepository) {
-        NutRepository = nutRepository;
+        this.nutRepository = nutRepository;
+    }
+
+    public Optional<Nut> findNut(String gost, String size) {
+        return nutRepository.findFirstByGostAndSize(gost, size);
+    }
+
+    public Double getNutWeight(String gost, String size) {
+        Optional<Nut> nut = findNut(gost, size);
+        if (nut.isPresent()) {
+            return nut.get().getWeight();
+        }
+        return 0.0;
     }
 }
