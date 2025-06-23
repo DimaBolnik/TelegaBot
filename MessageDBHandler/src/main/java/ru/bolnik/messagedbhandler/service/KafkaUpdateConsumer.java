@@ -2,39 +2,60 @@ package ru.bolnik.messagedbhandler.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
+import org.springframework.kafka.core.KafkaTemplate;
+
 import ru.bolnik.messagedbhandler.dto.ProductDto;
+import ru.bolnik.messagedbhandler.dto.ProductResponseDto;
+
+import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class KafkaUpdateConsumer {
 
     private static final Logger logger = LoggerFactory.getLogger(KafkaUpdateConsumer.class);
 
     private final ObjectMapper objectMapper;
-    private final BoltService boltService;
-    private final NutService nutService;
+    private final ProductCalculationService calculationService;
+    private final KafkaTemplate<String, String> kafkaTemplate;
 
-    public KafkaUpdateConsumer(ObjectMapper objectMapper, BoltService boltService, NutService nutService) {
-        this.objectMapper = objectMapper;
-        this.boltService = boltService;
-        this.nutService = nutService;
-    }
+    @Value("${kafka.topic.telegram-responses}")
+    private String responseTopic;
 
-
-    // Подписываемся на топик из application.properties
     @KafkaListener(topics = "${kafka.topic.telegram-updates}", groupId = "console-group")
     public void consume(String message) {
         try {
             ProductDto dto = objectMapper.readValue(message, ProductDto.class);
-            logger.info("Получено сообщение из Kafka: {}", message);
+            logger.info("Получено из Kafka: {}", dto);
 
-            System.out.println(dto.toString());
+            // Получаем данные из DTO
+            String productType = dto.getType();
+            String gost = dto.getGost();
+            String size = dto.getSize();
+            Integer length = dto.getLength();
+            Double totalWeight = dto.getWeight();
+            Long chatId = dto.getChatId();
+
+            // Вызываем общий метод
+            Optional<ProductResponseDto> result = calculationService.calculateQuantity(productType, gost, size, length, totalWeight, chatId);
+
+            if (result.isPresent()) {
+                ProductResponseDto responseDto = result.get();
+                String jsonResponse = objectMapper.writeValueAsString(responseDto);
+                kafkaTemplate.send(responseTopic, jsonResponse);
+                logger.info("Отправлено в Kafka: {}", jsonResponse);
+            } else {
+                logger.warn("Не удалось рассчитать количество для {}", dto);
+            }
 
         } catch (JsonProcessingException e) {
-            logger.error("Ошибка десериализации JSON", e);
+            logger.error("Ошибка десериализации/сериализации JSON", e);
         }
     }
 }
