@@ -15,5 +15,5 @@ public class ProductDto {
     private String gost;
     private String size;
     private Integer length;   // только для Bolt
-    private Double weight;
+    private Double weight;   // Общий вес изделий
 }
