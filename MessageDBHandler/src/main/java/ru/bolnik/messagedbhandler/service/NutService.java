@@ -18,12 +18,4 @@ public class NutService {
     public Optional<Nut> findNut(String gost, String size) {
         return nutRepository.findFirstByGostAndSize(gost, size);
     }
-
-    public Double getNutWeight(String gost, String size) {
-        Optional<Nut> nut = findNut(gost, size);
-        if (nut.isPresent()) {
-            return nut.get().getWeight();
-        }
-        return 0.0;
-    }
 }
