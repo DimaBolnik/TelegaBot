@@ -1,6 +1,7 @@
 package ru.bolnik.messagedbhandler.service;
 
 import org.springframework.stereotype.Service;
+import ru.bolnik.messagedbhandler.dto.ProductDto;
 import ru.bolnik.messagedbhandler.dto.ProductResponseDto;
 import ru.bolnik.messagedbhandler.entity.Bolt;
 import ru.bolnik.messagedbhandler.entity.Nut;
@@ -23,8 +24,16 @@ public class ProductCalculationService {
     /**
      * Универсальный метод для расчёта количества изделий
      */
-    public Optional<ProductResponseDto> calculateQuantity(String productType, String gost, String size, Integer length, Double totalWeightGrams, Long chatId) {
-        if (totalWeightGrams == null || totalWeightGrams <= 0) {
+    public Optional<ProductResponseDto> calculateQuantity(ProductDto dto) {
+
+        String productType = dto.getType();
+        String gost = dto.getGost();
+        String size = dto.getSize();
+        Integer length = dto.getLength();
+        Double totalWeight = dto.getWeight();
+        Long chatId = dto.getChatId();
+
+        if (totalWeight == null || totalWeight <= 0) {
             return Optional.empty();
         }
 
@@ -56,7 +65,7 @@ public class ProductCalculationService {
             return Optional.empty(); // Вес не найден
         }
 
-        int quantity = (int) (totalWeightGrams / weightOne);
+        int quantity = (int) (totalWeight / weightOne);
 
         return Optional.of(new ProductResponseDto(chatId, productType, quantity));
     }

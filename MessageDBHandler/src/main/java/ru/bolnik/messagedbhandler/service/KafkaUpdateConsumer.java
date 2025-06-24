@@ -34,16 +34,8 @@ public class KafkaUpdateConsumer {
             ProductDto dto = objectMapper.readValue(message, ProductDto.class);
             logger.info("Получено из Kafka: {}", dto);
 
-            // Получаем данные из DTO
-            String productType = dto.getType();
-            String gost = dto.getGost();
-            String size = dto.getSize();
-            Integer length = dto.getLength();
-            Double totalWeight = dto.getWeight();
-            Long chatId = dto.getChatId();
-
             // Вызываем общий метод
-            Optional<ProductResponseDto> result = calculationService.calculateQuantity(productType, gost, size, length, totalWeight, chatId);
+            Optional<ProductResponseDto> result = calculationService.calculateQuantity(dto);
 
             if (result.isPresent()) {
                 ProductResponseDto responseDto = result.get();
