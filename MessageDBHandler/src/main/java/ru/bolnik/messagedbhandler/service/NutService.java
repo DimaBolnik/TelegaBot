@@ -15,7 +15,7 @@ public class NutService {
         this.nutRepository = nutRepository;
     }
 
-    public Optional<Nut> findNut(String gost, String size) {
+    public Optional<Nut> findFirstByGostAndSize(String gost, String size) {
         return nutRepository.findFirstByGostAndSize(gost, size);
     }
 }

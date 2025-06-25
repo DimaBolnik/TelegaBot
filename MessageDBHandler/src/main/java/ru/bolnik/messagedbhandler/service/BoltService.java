@@ -15,7 +15,7 @@ public class BoltService {
         this.boltRepository = boltRepository;
     }
 
-    public Optional<Bolt> findBolt(String gost, String size, Integer length) {
+    public Optional<Bolt> findFirstByGostAndSizeAndLength(String gost, String size, Integer length) {
         return boltRepository.findFirstByGostAndSizeAndLength(gost, size, length);
     }
 }

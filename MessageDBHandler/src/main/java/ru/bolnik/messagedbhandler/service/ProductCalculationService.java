@@ -5,20 +5,18 @@ import ru.bolnik.messagedbhandler.dto.ProductDto;
 import ru.bolnik.messagedbhandler.dto.ProductResponseDto;
 import ru.bolnik.messagedbhandler.entity.Bolt;
 import ru.bolnik.messagedbhandler.entity.Nut;
-import ru.bolnik.messagedbhandler.repository.BoltRepository;
-import ru.bolnik.messagedbhandler.repository.NutRepository;
 
 import java.util.Optional;
 
 @Service
 public class ProductCalculationService {
 
-    private final BoltRepository boltRepository;
-    private final NutRepository nutRepository;
+    private final BoltService boltService;
+    private final NutService nutService;
 
-    public ProductCalculationService(BoltRepository boltRepository, NutRepository nutRepository) {
-        this.boltRepository = boltRepository;
-        this.nutRepository = nutRepository;
+    public ProductCalculationService(BoltService boltService, NutService nutService) {
+        this.boltService = boltService;
+        this.nutService = nutService;
     }
 
     /**
@@ -44,14 +42,14 @@ public class ProductCalculationService {
                 if (length == null) {
                     return Optional.empty(); // Для болта нужна длина
                 }
-                Optional<Bolt> boltOpt = boltRepository.findFirstByGostAndSizeAndLength(gost, size, length);
+                Optional<Bolt> boltOpt = boltService.findFirstByGostAndSizeAndLength(gost, size, length);
                 if (boltOpt.isPresent()) {
                     weightOne = boltOpt.get().getWeight();
                 }
                 break;
 
             case "Nut":
-                Optional<Nut> nutOpt = nutRepository.findFirstByGostAndSize(gost, size);
+                Optional<Nut> nutOpt = nutService.findFirstByGostAndSize(gost, size);
                 if (nutOpt.isPresent()) {
                     weightOne = nutOpt.get().getWeight();
                 }
