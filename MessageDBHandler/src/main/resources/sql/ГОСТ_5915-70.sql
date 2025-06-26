@@ -1,4 +1,4 @@
-Lj,fdktybtINSERT INTO nuts (gost, size, weight_gram)
+INSERT INTO nuts (gost, size, weight_gram)
 VALUES
     ('ГОСТ 5915-70', 'M1.6', 0.074),
     ('ГОСТ 5915-70', 'M2', 0.141),
