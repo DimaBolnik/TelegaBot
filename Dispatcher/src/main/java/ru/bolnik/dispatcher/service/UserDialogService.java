@@ -72,13 +72,13 @@ public class UserDialogService {
     private void waitForBoltGost(Long chatId, String gost) {
         BoltDataStore.setTempGost(chatId, gost);
         DialogState.setState(chatId, DialogStateEnum.WAIT_BOLT_SIZE);
-        sendMessage(chatId, "Введите размер болта (например, M10):");
+        sendMessage(chatId, "Введите размер болта (миллиметр):");
     }
 
     private void waitForBoltSize(Long chatId, String size) {
         BoltDataStore.setTempSize(chatId, size);
         DialogState.setState(chatId, DialogStateEnum.WAIT_BOLT_LENGTH);
-        sendMessage(chatId, "Введите длину болта (мм):");
+        sendMessage(chatId, "Введите длину болта (миллиметр):");
     }
 
     private void waitForBoltLength(Long chatId, String lengthStr) {
@@ -86,7 +86,7 @@ public class UserDialogService {
             int length = Integer.parseInt(lengthStr);
             DialogState.setState(chatId, DialogStateEnum.WAIT_BOLT_WEIGHT);
             BoltDataStore.setTempLength(chatId, length);
-            sendMessage(chatId, "Введите вес изделий (грамм):");
+            sendMessage(chatId, "Введите общий вес болтов (грамм):");
         } catch (NumberFormatException e) {
             sendMessage(chatId, "Длина должна быть числом. Попробуйте снова.");
         }
@@ -120,13 +120,13 @@ public class UserDialogService {
     private void waitForNutGost(Long chatId, String gost) {
         NutDataStore.setTempGost(chatId, gost);
         DialogState.setState(chatId, DialogStateEnum.WAIT_NUT_SIZE);
-        sendMessage(chatId, "Введите размер гайки (например, M10):");
+        sendMessage(chatId, "Введите размер гайки  (миллиметр):");
     }
 
     private void waitForNutSize(Long chatId, String size) {
         NutDataStore.setTempSize(chatId, size);
         DialogState.setState(chatId, DialogStateEnum.WAIT_NUT_WEIGHT);
-        sendMessage(chatId, "Введите вес одной гайки (грамм):");
+        sendMessage(chatId, "Введите общий вес гаек (грамм):");
     }
 
     private void waitForNutWeight(Long chatId, String weightStr) {
