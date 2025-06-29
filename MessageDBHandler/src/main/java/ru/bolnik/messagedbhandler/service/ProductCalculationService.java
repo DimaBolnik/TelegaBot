@@ -5,6 +5,7 @@ import ru.bolnik.messagedbhandler.dto.ProductDto;
 import ru.bolnik.messagedbhandler.dto.ProductResponseDto;
 import ru.bolnik.messagedbhandler.entity.Bolt;
 import ru.bolnik.messagedbhandler.entity.Nut;
+import ru.bolnik.messagedbhandler.repository.WasherRepository;
 
 import java.util.Optional;
 
@@ -13,10 +14,12 @@ public class ProductCalculationService {
 
     private final BoltService boltService;
     private final NutService nutService;
+    private final WasherRepository washerRepository;
 
-    public ProductCalculationService(BoltService boltService, NutService nutService) {
+    public ProductCalculationService(BoltService boltService, NutService nutService, WasherRepository washerRepository) {
         this.boltService = boltService;
         this.nutService = nutService;
+        this.washerRepository = washerRepository;
     }
 
     /**
@@ -27,7 +30,7 @@ public class ProductCalculationService {
         String productType = dto.getType();
         String gost = dto.getGost();
         String size = dto.getSize();
-        Integer length = dto.getLength();
+        Integer length = dto.getLength(); // только для болта
         Double totalWeight = dto.getWeight();
         Long chatId = dto.getChatId();
 
@@ -52,6 +55,13 @@ public class ProductCalculationService {
                 Optional<Nut> nutOpt = nutService.findFirstByGostAndSize(gost, size);
                 if (nutOpt.isPresent()) {
                     weightOne = nutOpt.get().getWeight();
+                }
+                break;
+
+            case "Washer":
+                var washerOpt = washerRepository.findFirstByGostAndSize(gost, size);
+                if (washerOpt.isPresent()) {
+                    weightOne = washerOpt.get().getWeight();
                 }
                 break;
 
