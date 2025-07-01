@@ -1,9 +1,10 @@
 package ru.bolnik.dispatcher.service.data;
 
-// enum для выбора изделия: Болт или Гайка(возможно добавление других наименований)
+// enum для выбора изделия: Болт или Гайка, Шайба(возможно добавление других наименований)
 public enum ProductTypeEnum {
     BOLT("Болт"),
-    NUT("Гайка");
+    NUT("Гайка"),
+    WASHER("Шайка");
 
     private final String label;
 
