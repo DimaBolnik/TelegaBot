@@ -12,7 +12,6 @@ public class TelegramMessageDispatcher {
 
     private static final Logger logger = LoggerFactory.getLogger(TelegramBot.class);
 
-
     //  Храним ссылку на TelegramBot и использует его для отправки ответов
     private TelegramBot telegramBot;
 

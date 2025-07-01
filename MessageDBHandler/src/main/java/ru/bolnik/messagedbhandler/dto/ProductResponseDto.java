@@ -10,6 +10,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ProductResponseDto {
     private Long chatId;
-    private String type; // Bolt или Nut
+    private String type; // // "Bolt", "Washer" или "Nut"
     private Integer quantity; // Количество штук
 }

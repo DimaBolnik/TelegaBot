@@ -16,5 +16,4 @@ public class Bolt implements Product {
     // вес всего количество болтов
     private final double weight;
 
-
 }
