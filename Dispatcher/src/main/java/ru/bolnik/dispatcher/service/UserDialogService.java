@@ -7,8 +7,10 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import ru.bolnik.dispatcher.controller.TelegramBot;
 import ru.bolnik.dispatcher.model.Bolt;
 import ru.bolnik.dispatcher.model.Nut;
+import ru.bolnik.dispatcher.model.Washer;
 import ru.bolnik.dispatcher.model.tempState.BoltDataStore;
 import ru.bolnik.dispatcher.model.tempState.NutDataStore;
+import ru.bolnik.dispatcher.model.tempState.WasherDataStore;
 import ru.bolnik.dispatcher.service.data.DialogState;
 import ru.bolnik.dispatcher.service.data.DialogStateEnum;
 import ru.bolnik.dispatcher.service.data.ProductTypeEnum;
@@ -41,22 +43,23 @@ public class UserDialogService {
             case WAIT_NUT_GOST -> waitForNutGost(chatId, messageText);
             case WAIT_NUT_SIZE -> waitForNutSize(chatId, messageText);
             case WAIT_NUT_WEIGHT -> waitForNutWeight(chatId, messageText);
+            case WAIT_WASHER_GOST -> waitForWasherGost(chatId, messageText);
+            case WAIT_WASHER_SIZE -> waitForWasherSize(chatId, messageText);
+            case WAIT_WASHER_WEIGHT -> waitForWasherWeight(chatId, messageText);
         }
     }
 
     private void startDialog(Long chatId) {
-        sendMessage(chatId, "Здравствуйте! Что вы хотите создать?\n1. Болт\n2. Гайка");
+        sendMessage(chatId, "Здравствуйте! Что вы хотите создать?\n1. Болт\n2. Гайка\n3. Шайба");
         DialogState.setState(chatId, DialogStateEnum.WAIT_FOR_PRODUCT_TYPE);
     }
 
     private void waitForProductType(Long chatId, String input) {
         ProductTypeEnum productType = ProductTypeEnum.fromLabel(input);
-
         if (productType == null) {
-            sendMessage(chatId, "Неверный выбор. Пожалуйста, выберите 'Болт' или 'Гайка'.");
+            sendMessage(chatId, "Неверный выбор. Пожалуйста, выберите 'Болт', 'Гайка' или 'Шайба'.");
             return;
         }
-
         switch (productType) {
             case BOLT -> {
                 DialogState.setState(chatId, DialogStateEnum.WAIT_BOLT_GOST);
@@ -65,6 +68,10 @@ public class UserDialogService {
             case NUT -> {
                 DialogState.setState(chatId, DialogStateEnum.WAIT_NUT_GOST);
                 sendMessage(chatId, "Выбрана гайка. Введите ГОСТ:");
+            }
+            case WASHER -> {
+                DialogState.setState(chatId, DialogStateEnum.WAIT_WASHER_GOST);
+                sendMessage(chatId, "Выбрана шайба. Введите ГОСТ:");
             }
         }
     }
@@ -146,6 +153,41 @@ public class UserDialogService {
             NutDataStore.clear(chatId);
             DialogState.clearState(chatId);
             sendMessage(chatId, "Гайка успешно создана и отправлена в систему!");
+        } catch (NumberFormatException e) {
+            sendMessage(chatId, "Вес должен быть числом. Попробуйте снова.");
+        }
+    }
+
+    private void waitForWasherGost(Long chatId, String gost) {
+        WasherDataStore.setTempGost(chatId, gost);
+        DialogState.setState(chatId, DialogStateEnum.WAIT_WASHER_SIZE);
+        sendMessage(chatId, "Введите размер шайбы (миллиметр):");
+    }
+
+    private void waitForWasherSize(Long chatId, String size) {
+        WasherDataStore.setTempSize(chatId, size);
+        DialogState.setState(chatId, DialogStateEnum.WAIT_WASHER_WEIGHT);
+        sendMessage(chatId, "Введите общий вес шайб (грамм):");
+    }
+
+    private void waitForWasherWeight(Long chatId, String weightStr) {
+        try {
+            double weight = Double.parseDouble(weightStr);
+            if (weight <= 0) {
+                sendMessage(chatId, "Вес должен быть положительным числом.");
+                return;
+            }
+
+            String gost = WasherDataStore.getTempGost(chatId);
+            String size = WasherDataStore.getTempSize(chatId);
+
+            Washer washer = new Washer(gost, size, weight);
+            kafkaUpdateService.sendProductToKafka(washer, chatId);
+
+            WasherDataStore.clear(chatId);
+            DialogState.clearState(chatId);
+
+            sendMessage(chatId, "Шайба успешно создана и отправлена в систему!");
         } catch (NumberFormatException e) {
             sendMessage(chatId, "Вес должен быть числом. Попробуйте снова.");
         }

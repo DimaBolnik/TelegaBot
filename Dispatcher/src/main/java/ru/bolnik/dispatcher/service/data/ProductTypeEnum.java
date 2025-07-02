@@ -4,7 +4,7 @@ package ru.bolnik.dispatcher.service.data;
 public enum ProductTypeEnum {
     BOLT("Болт"),
     NUT("Гайка"),
-    WASHER("Шайка");
+    WASHER("Шайба");
 
     private final String label;
 
