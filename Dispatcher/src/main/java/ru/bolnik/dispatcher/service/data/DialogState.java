@@ -7,6 +7,7 @@ import java.util.Map;
 public class DialogState {
 
     private static final Map<Long, DialogStateEnum> states = new HashMap<>();
+    private static final Map<Long, CalculationType> calculationTypes = new HashMap<>();
 
     public static void setState(Long chatId, DialogStateEnum state) {
         states.put(chatId, state);
@@ -18,5 +19,17 @@ public class DialogState {
 
     public static void clearState(Long chatId) {
         states.remove(chatId);
+    }
+
+    public static void setCalculationType(Long chatId, CalculationType type) {
+        calculationTypes.put(chatId, type);
+    }
+
+    public static CalculationType getCalculationType(Long chatId) {
+        return calculationTypes.get(chatId);
+    }
+
+    public static void clearCalculationType(Long chatId) {
+        calculationTypes.remove(chatId);
     }
 }
