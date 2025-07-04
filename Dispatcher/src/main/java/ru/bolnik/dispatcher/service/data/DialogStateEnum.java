@@ -5,14 +5,8 @@ package ru.bolnik.dispatcher.service.data;
 public enum DialogStateEnum {
     START,
     WAIT_FOR_PRODUCT_TYPE,
-    WAIT_BOLT_GOST,
-    WAIT_BOLT_SIZE,
-    WAIT_BOLT_LENGTH,
-    WAIT_BOLT_WEIGHT,
-    WAIT_NUT_GOST,
-    WAIT_NUT_SIZE,
-    WAIT_NUT_WEIGHT,
-    WAIT_WASHER_GOST,
-    WAIT_WASHER_SIZE,
-    WAIT_WASHER_WEIGHT
+    WAIT_GOST,
+    WAIT_SIZE,
+    WAIT_LENGTH,
+    WAIT_WEIGHT
 }
