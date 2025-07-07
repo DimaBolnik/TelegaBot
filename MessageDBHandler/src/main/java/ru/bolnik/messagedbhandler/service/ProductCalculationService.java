@@ -6,6 +6,7 @@ import ru.bolnik.messagedbhandler.dto.ProductResponseDto;
 import ru.bolnik.messagedbhandler.entity.Bolt;
 import ru.bolnik.messagedbhandler.entity.Nut;
 import ru.bolnik.messagedbhandler.repository.WasherRepository;
+import ru.bolnik.messagedbhandler.service.data.ProductTypeEnum;
 
 import java.util.Optional;
 
@@ -27,7 +28,8 @@ public class ProductCalculationService {
      */
     public Optional<ProductResponseDto> calculateQuantity(ProductDto dto) {
 
-        String productType = dto.getType();
+
+        ProductTypeEnum productType = dto.getType();
         String gost = dto.getGost();
         String size = dto.getSize();
         Integer length = dto.getLength(); // только для болта
@@ -41,7 +43,7 @@ public class ProductCalculationService {
         Double weightOne = null;
 
         switch (productType) {
-            case "Bolt":
+            case BOLT:
                 if (length == null) {
                     return Optional.empty(); // Для болта нужна длина
                 }
@@ -51,14 +53,14 @@ public class ProductCalculationService {
                 }
                 break;
 
-            case "Nut":
+            case NUT:
                 Optional<Nut> nutOpt = nutService.findFirstByGostAndSize(gost, size);
                 if (nutOpt.isPresent()) {
                     weightOne = nutOpt.get().getWeight();
                 }
                 break;
 
-            case "Washer":
+            case WASHER:
                 var washerOpt = washerRepository.findFirstByGostAndSize(gost, size);
                 if (washerOpt.isPresent()) {
                     weightOne = washerOpt.get().getWeight();
@@ -75,6 +77,6 @@ public class ProductCalculationService {
 
         int quantity = (int) (totalWeight / weightOne);
 
-        return Optional.of(new ProductResponseDto(chatId, productType, quantity));
+        return Optional.of(new ProductResponseDto(chatId, productType.toString(), quantity));
     }
 }
