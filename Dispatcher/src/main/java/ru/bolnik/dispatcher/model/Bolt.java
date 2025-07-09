@@ -11,9 +11,9 @@ import lombok.ToString;
 public class Bolt implements Product {
 
     private final String gost;
-    private final String size;
+    private final int size;
     private final int length;
     // вес всего количество болтов
-    private final double weight;
+    private final int weight;
 
 }

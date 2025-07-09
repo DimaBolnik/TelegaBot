@@ -12,7 +12,7 @@ import lombok.ToString;
 public class Nut implements Product {
 
     private final String gost;
-    private final String size;
+    private final int size;
     // вес всего колличества гаек
-    private final double weight;
+    private final int weight;
 }

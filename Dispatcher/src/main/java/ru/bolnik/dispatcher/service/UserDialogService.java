@@ -75,16 +75,21 @@ public class UserDialogService {
     }
 
     // 4. Ввод размера
-    private void waitForSize(Long chatId, String size) {
-        ProductTypeEnum productType = DialogState.getProductType(chatId);
-        ProductDataStore.setSize(chatId, size);
+    private void waitForSize(Long chatId, String sizeStr) {
+        try {
+            Integer size = Integer.parseInt(sizeStr);
+            ProductTypeEnum productType = DialogState.getProductType(chatId);
+            ProductDataStore.setSize(chatId, size);
 
-        if (productType == ProductTypeEnum.BOLT) {
-            DialogState.setState(chatId, DialogStateEnum.WAIT_LENGTH);
-            sendMessage(chatId, "Введите длину (мм):");
-        } else {
-            DialogState.setState(chatId, DialogStateEnum.WAIT_WEIGHT);
-            sendMessage(chatId, "Введите общий вес (гр):");
+            if (productType == ProductTypeEnum.BOLT) {
+                DialogState.setState(chatId, DialogStateEnum.WAIT_LENGTH);
+                sendMessage(chatId, "Введите длину (мм):");
+            } else {
+                DialogState.setState(chatId, DialogStateEnum.WAIT_WEIGHT);
+                sendMessage(chatId, "Введите общий вес (гр):");
+            }
+        } catch (NumberFormatException e) {
+            sendMessage(chatId, "Длина должна быть числом. Попробуйте снова.");
         }
     }
 
@@ -103,7 +108,7 @@ public class UserDialogService {
     // 6. Ввод общего веса и отправка в kafka
     private void waitForWeight(Long chatId, String weightStr) {
         try {
-            double weight = Double.parseDouble(weightStr);
+            int weight = Integer.parseInt(weightStr);
             if (weight <= 0) {
                 sendMessage(chatId, "Вес должен быть положительным числом.");
                 return;
@@ -122,9 +127,9 @@ public class UserDialogService {
     }
 
     // Создание объекта Product на основе типа
-    private Product createProduct(Long chatId, ProductTypeEnum productType, double weight) {
+    private Product createProduct(Long chatId, ProductTypeEnum productType, int weight) {
         String gost = ProductDataStore.getGost(chatId);
-        String size = ProductDataStore.getSize(chatId);
+        Integer size = ProductDataStore.getSize(chatId);
 
         return switch (productType) {
             case BOLT -> new Bolt(gost, size, BoltDataStore.getLength(chatId), weight);
