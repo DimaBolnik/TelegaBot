@@ -39,6 +39,7 @@ public class UserDialogService {
             case WAIT_SIZE -> waitForSize(chatId, messageText);
             case WAIT_LENGTH -> waitForLength(chatId, messageText);
             case WAIT_WEIGHT -> waitForWeight(chatId, messageText);
+            case FINISH -> handleProductCreation(chatId);
             default -> sendMessage(chatId, "Неизвестное состояние. Попробуйте снова.");
         }
     }
@@ -76,66 +77,83 @@ public class UserDialogService {
 
     // 4. Ввод размера
     private void waitForSize(Long chatId, String sizeStr) {
-        try {
-            Integer size = Integer.parseInt(sizeStr);
-            ProductTypeEnum productType = DialogState.getProductType(chatId);
-            ProductDataStore.setSize(chatId, size);
+        if (!isValidPositiveInteger(chatId, sizeStr, "Размер")) {
+            return;
+        }
 
-            if (productType == ProductTypeEnum.BOLT) {
-                DialogState.setState(chatId, DialogStateEnum.WAIT_LENGTH);
-                sendMessage(chatId, "Введите длину (мм):");
-            } else {
-                DialogState.setState(chatId, DialogStateEnum.WAIT_WEIGHT);
-                sendMessage(chatId, "Введите общий вес (гр):");
-            }
-        } catch (NumberFormatException e) {
-            sendMessage(chatId, "Длина должна быть числом. Попробуйте снова.");
+        Integer size = Integer.parseInt(sizeStr);
+        ProductTypeEnum productType = DialogState.getProductType(chatId);
+        ProductDataStore.setSize(chatId, size);
+
+        if (productType == ProductTypeEnum.BOLT) {
+            DialogState.setState(chatId, DialogStateEnum.WAIT_LENGTH);
+            sendMessage(chatId, "Введите длину (мм):");
+        } else {
+            DialogState.setState(chatId, DialogStateEnum.WAIT_WEIGHT);
+            sendMessage(chatId, "Введите общий вес (гр):");
         }
     }
 
     // 5. Ввод длины (только для болта)
     private void waitForLength(Long chatId, String lengthStr) {
-        try {
-            int length = Integer.parseInt(lengthStr);
-            BoltDataStore.setLength(chatId, length);
-            DialogState.setState(chatId, DialogStateEnum.WAIT_WEIGHT);
-            sendMessage(chatId, "Введите общий вес (гр):");
-        } catch (NumberFormatException e) {
-            sendMessage(chatId, "Длина должна быть числом. Попробуйте снова.");
+        if (!isValidPositiveInteger(chatId, lengthStr, "Длина")) {
+            return;
         }
+
+        int length = Integer.parseInt(lengthStr);
+        BoltDataStore.setLength(chatId, length);
+        DialogState.setState(chatId, DialogStateEnum.WAIT_WEIGHT);
+        sendMessage(chatId, "Введите общий вес (гр):");
     }
 
-    // 6. Ввод общего веса и отправка в kafka
+    // 6. Ввод общего веса
     private void waitForWeight(Long chatId, String weightStr) {
-        try {
-            int weight = Integer.parseInt(weightStr);
-            if (weight <= 0) {
-                sendMessage(chatId, "Вес должен быть положительным числом.");
-                return;
-            }
-
-            ProductTypeEnum productType = DialogState.getProductType(chatId);
-            Product product = createProduct(chatId, productType, weight);
-
-            kafkaUpdateService.sendProductToKafka(product, chatId);
-            clearTempData(chatId, productType);
-
-            sendMessage(chatId, productType.getLabel() + " успешно создан и отправлен!");
-        } catch (NumberFormatException e) {
-            sendMessage(chatId, "Вес должен быть числом. Попробуйте снова.");
+        if (!isValidPositiveInteger(chatId, weightStr, "Вес")) {
+            return;
         }
+
+        int weight = Integer.parseInt(weightStr);
+        ProductDataStore.setWeight(chatId, weight);
+        DialogState.setState(chatId, DialogStateEnum.FINISH); // Переход на финальный шаг
+        handleProductCreation(chatId); // Можно вызвать напрямую, если нужно
+    }
+
+    // Метод создания и отправки продукта
+    private void handleProductCreation(Long chatId) {
+        ProductTypeEnum productType = DialogState.getProductType(chatId);
+        int weight = ProductDataStore.getWeight(chatId);
+        Product product = createProduct(chatId, productType, weight);
+
+        kafkaUpdateService.sendProductToKafka(product, chatId);
+        clearTempData(chatId, productType);
+        sendMessage(chatId, productType.getLabel() + " успешно создан и отправлен!");
     }
 
     // Создание объекта Product на основе типа
     private Product createProduct(Long chatId, ProductTypeEnum productType, int weight) {
         String gost = ProductDataStore.getGost(chatId);
-        Integer size = ProductDataStore.getSize(chatId);
+        int size = ProductDataStore.getSize(chatId);
 
         return switch (productType) {
             case BOLT -> new Bolt(gost, size, BoltDataStore.getLength(chatId), weight);
             case NUT -> new Nut(gost, size, weight);
             case WASHER -> new Washer(gost, size, weight);
         };
+    }
+
+    // Проверка, что строка является положительным целым числом
+    private boolean isValidPositiveInteger(Long chatId, String valueStr, String fieldName) {
+        try {
+            int value = Integer.parseInt(valueStr);
+            if (value <= 0) {
+                sendMessage(chatId, fieldName + " должно быть положительным числом.");
+                return false;
+            }
+            return true;
+        } catch (NumberFormatException e) {
+            sendMessage(chatId, fieldName + " должно быть целым числом. Попробуйте снова.");
+            return false;
+        }
     }
 
     // Очистка временных данных

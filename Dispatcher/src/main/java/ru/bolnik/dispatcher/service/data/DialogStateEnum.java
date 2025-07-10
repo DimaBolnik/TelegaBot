@@ -8,5 +8,6 @@ public enum DialogStateEnum {
     WAIT_GOST,
     WAIT_SIZE,
     WAIT_LENGTH,
-    WAIT_WEIGHT
+    WAIT_WEIGHT,
+    FINISH
 }
