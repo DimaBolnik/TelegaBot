@@ -4,10 +4,12 @@ package ru.bolnik.dispatcher.service.data;
  пока так, потом организую как-нибудь по другому.*/
 public enum DialogStateEnum {
     START,
+    WAIT_FOR_ACTION_TYPE,
     WAIT_FOR_PRODUCT_TYPE,
     WAIT_GOST,
     WAIT_SIZE,
     WAIT_LENGTH,
     WAIT_WEIGHT,
+    WAIT_QUANTITY,
     FINISH
 }
