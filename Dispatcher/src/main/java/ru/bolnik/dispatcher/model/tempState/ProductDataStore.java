@@ -9,6 +9,7 @@ public class ProductDataStore {
     private static final Map<Long, String> gosts = new HashMap<>();
     private static final Map<Long, Integer> sizes = new HashMap<>();
     private static final Map<Long, Integer> weights = new HashMap<>();
+    private static final Map<Long, Integer> quantities = new HashMap<>();
 
     public static void setGost(Long chatId, String gost) {
         gosts.put(chatId, gost);
@@ -34,9 +35,18 @@ public class ProductDataStore {
         return weights.getOrDefault(chatId, 0);
     }
 
+    public static void setQuantity(Long chatId, Integer quantity) {
+        quantities.put(chatId, quantity);
+    }
+
+    public static Integer getQuantity(Long chatId) {
+        return quantities.get(chatId);
+    }
+
     public static void clear(Long chatId) {
         gosts.remove(chatId);
         sizes.remove(chatId);
         weights.remove(chatId);
+        quantities.remove(chatId);
     }
 }

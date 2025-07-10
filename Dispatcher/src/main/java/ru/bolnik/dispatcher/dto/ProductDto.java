@@ -16,4 +16,5 @@ public class ProductDto {
     private final Integer size;
     private final Integer length; // Добавил для Bolt
     private final Integer weight;
+    private final Integer quantity;
 }
