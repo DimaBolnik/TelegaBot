@@ -37,5 +37,6 @@ public class DialogState {
     public static void clearState(Long chatId) {
         states.remove(chatId);
         productTypes.remove(chatId);
+        actionType.remove(chatId);
     }
 }

@@ -18,7 +18,7 @@ public enum ProductTypeEnum {
 
     public static ProductTypeEnum fromLabel(String label) {
         for (ProductTypeEnum type : values()) {
-            if (type.getLabel().equalsIgnoreCase(label)) {
+            if (type.ordinal() + 1 == Integer.parseInt(label)) {
                 return type;
             }
         }

@@ -41,7 +41,8 @@ public class KafkaUpdateService {
                 product.getGost(),
                 product.getSize(),
                 length,
-                product.getWeight()
+                product.getWeight(),
+                product.getQuantity()
         );
 
         String json;
