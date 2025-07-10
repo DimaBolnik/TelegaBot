@@ -15,4 +15,5 @@ public class Washer implements Product {
     private final int size;
     // вес всего колличества шайб
     private final int weight;
+    private final Integer quantity;
 }

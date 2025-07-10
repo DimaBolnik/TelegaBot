@@ -15,5 +15,6 @@ public class Bolt implements Product {
     private final int length;
     // вес всего количество болтов
     private final int weight;
+    private final Integer quantity;
 
 }

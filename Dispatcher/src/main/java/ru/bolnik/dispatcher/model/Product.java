@@ -7,4 +7,5 @@ public interface Product {
     String getGost();
     int getSize();
     int getWeight();
+    Integer getQuantity();
 }

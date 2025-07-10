@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.ToString;
 
-
 // модель гайки
 @Getter
 @ToString
@@ -15,4 +14,5 @@ public class Nut implements Product {
     private final int size;
     // вес всего колличества гаек
     private final int weight;
+    private final Integer quantity;
 }
