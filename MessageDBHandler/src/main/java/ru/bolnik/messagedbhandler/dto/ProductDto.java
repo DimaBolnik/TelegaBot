@@ -2,6 +2,7 @@ package ru.bolnik.messagedbhandler.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
+import ru.bolnik.messagedbhandler.service.data.ActionType;
 import ru.bolnik.messagedbhandler.service.data.ProductTypeEnum;
 
 // DTO для получения данных из Kafka
@@ -17,4 +18,6 @@ public class ProductDto {
     private String size;
     private Integer length;   // только для Bolt
     private Double weight;   // Общий вес изделий
+    private Integer quantity; // может быть null
+    private ActionType actionType;
 }

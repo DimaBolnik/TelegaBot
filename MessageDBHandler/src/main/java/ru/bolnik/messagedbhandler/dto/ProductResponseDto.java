@@ -12,4 +12,5 @@ public class ProductResponseDto {
     private Long chatId;
     private String type; // // "Bolt", "Washer" или "Nut"
     private Integer quantity; // Количество штук
+    private Integer totalWeight; // новое поле
 }
