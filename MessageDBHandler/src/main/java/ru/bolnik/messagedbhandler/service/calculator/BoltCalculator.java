@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import ru.bolnik.messagedbhandler.dto.ProductDto;
 import ru.bolnik.messagedbhandler.dto.ProductResponseDto;
 import ru.bolnik.messagedbhandler.service.BoltService;
+import ru.bolnik.messagedbhandler.service.data.ActionType;
 import ru.bolnik.messagedbhandler.service.data.ProductTypeEnum;
 
 import java.util.Optional;
@@ -23,13 +24,23 @@ public class BoltCalculator implements ProductCalculator {
     @Override
     public Optional<ProductResponseDto> calculate(ProductDto dto) {
         return boltService.findFirstByGostAndSizeAndLength(dto.getGost(), dto.getSize(), dto.getLength())
-                .map(b -> new ProductResponseDto(
-                        dto.getChatId(),
-                        dto.getType().toString(),
-                        calculateQuantity(dto.getWeight(), b.getWeight())));
+                .map(b -> {
+                    if (dto.getActionType() == ActionType.WEIGHT_TO_QUANTITY) {
+                        int quantity = calculateQuantity(dto.getWeight(), b.getWeight());
+                        return new ProductResponseDto(dto.getChatId(), dto.getType().toString(), quantity, null);
+                    } else if (dto.getActionType() == ActionType.QUANTITY_TO_WEIGHT) {
+                        int weight = calculateTotalWeight(dto.getQuantity(), b.getWeight());
+                        return new ProductResponseDto(dto.getChatId(), dto.getType().toString(), null, weight);
+                    }
+                    return null;
+                });
     }
 
     private int calculateQuantity(Double totalWeight, Double weightOne) {
         return weightOne > 0 ? (int) (totalWeight / weightOne) : 0;
+    }
+
+    private int calculateTotalWeight(Integer quantity, Double weightOne) {
+        return weightOne > 0 ? quantity * weightOne.intValue() : 0;
     }
 }
