@@ -12,6 +12,7 @@ import org.springframework.kafka.core.KafkaTemplate;
 
 import ru.bolnik.messagedbhandler.dto.ProductDto;
 import ru.bolnik.messagedbhandler.dto.ProductResponseDto;
+import ru.bolnik.messagedbhandler.service.data.ActionType;
 
 import java.util.Optional;
 
@@ -34,8 +35,15 @@ public class KafkaUpdateConsumer {
             ProductDto dto = objectMapper.readValue(message, ProductDto.class);
             logger.info("Получено из Kafka: {}", dto);
 
-            // Вызываем общий метод
-            Optional<ProductResponseDto> result = calculationService.calculateQuantity(dto);
+            Optional<ProductResponseDto> result;
+
+            if (dto.getWeight() != null ) {
+                dto.setActionType(ActionType.WEIGHT_TO_QUANTITY);
+            } else if (dto.getQuantity() != null) {
+                dto.setActionType(ActionType.QUANTITY_TO_WEIGHT);
+            }
+
+            result = calculationService.calculateQuantity(dto);
 
             if (result.isPresent()) {
                 ProductResponseDto responseDto = result.get();
