@@ -22,6 +22,6 @@ public class Washer {
     private String size;
 
     @Column(name = "weight_gram", nullable = false)
-    private Double weight; // вес одной шайбы в граммах
+    private Integer weight; // вес одной шайбы в граммах
 }
 

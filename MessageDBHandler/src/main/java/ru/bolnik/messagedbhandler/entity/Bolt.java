@@ -24,5 +24,5 @@ public class Bolt {
     private Integer length; // длина в миллиметрах
 
     @Column(name = "weight_gram", nullable = false)
-    private Double weight; // вес одного болта в граммах
+    private Integer weight; // вес одного болта в граммах
 }

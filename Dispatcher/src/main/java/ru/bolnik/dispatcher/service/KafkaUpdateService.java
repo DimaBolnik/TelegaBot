@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 import ru.bolnik.dispatcher.dto.ProductDto;
 import ru.bolnik.dispatcher.model.Bolt;
 import ru.bolnik.dispatcher.model.Product;
+import ru.bolnik.dispatcher.service.data.DialogState;
+import ru.bolnik.dispatcher.service.data.ProductTypeEnum;
 
 @Service
 public class KafkaUpdateService {
@@ -34,10 +36,10 @@ public class KafkaUpdateService {
         if (product instanceof Bolt) {
             length = ((Bolt) product).getLength();
         }
-
+        ProductTypeEnum productType = DialogState.getProductType(chatId);
         ProductDto dto = new ProductDto(
                 chatId,
-                product.getClass().getSimpleName(),
+                productType.name(),
                 product.getGost(),
                 product.getSize(),
                 length,

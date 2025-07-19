@@ -36,11 +36,11 @@ public class BoltCalculator implements ProductCalculator {
                 });
     }
 
-    private int calculateQuantity(Double totalWeight, Double weightOne) {
+    private int calculateQuantity(Integer totalWeight, Integer weightOne) {
         return weightOne > 0 ? (int) (totalWeight / weightOne) : 0;
     }
 
-    private int calculateTotalWeight(Integer quantity, Double weightOne) {
-        return weightOne > 0 ? quantity * weightOne.intValue() : 0;
+    private int calculateTotalWeight(Integer quantity, Integer weightOne) {
+        return weightOne > 0 ? quantity * weightOne : 0;
     }
 }

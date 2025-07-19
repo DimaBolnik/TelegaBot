@@ -21,5 +21,5 @@ public class Nut {
     private String size;
 
     @Column(name = "weight_gram", nullable = false)
-    private Double weight; // вес одной гайки в граммах
+    private Integer weight; // вес одной гайки в граммах
 }
